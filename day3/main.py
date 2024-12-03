@@ -7,9 +7,10 @@ def read_file(fname):
     with open(fname, 'r') as f:
         lines = [l.strip() for l in f.readlines()]
         return lines
-
-DO = "O"
-DONT = "N"
+# don't()
+# NNNNNNN
+DO = "OOOO"
+DONT = "NNNNNNN"
 
 def find_idx(string, substring):
   indices = []
@@ -30,19 +31,17 @@ def find_idx(string, substring):
 
 def should_count(s, idx):
     # idx = min(idx, len(s) - 1) # idk don't go off the end???
-    print("checking",)
-
     while idx > 0:
-        if s[idx] == DO:
-            print("enabled")
+        if s[idx] == DO[0]:
+            # print("enabled")
             return True
-        if s[idx] == DONT:
-            print("disabled")
+        if s[idx] == DONT[0]:
+            # print("disabled")
             return False
         idx -= 1
     
 
-    print("defaulting to on")
+    # print("defaulting to on")
     return True
 
 def part1(lines):
@@ -54,8 +53,6 @@ def part1(lines):
     total = 0
 
     for l in lines:
-        l = l.replace("don't()", DONT).replace("do()", DO)
-        
         potentials = find_idx(l, "mul(")
         for p in potentials:
             startIdx = p + 4 # because mul( is 4 long
@@ -63,40 +60,41 @@ def part1(lines):
                 break
             stopIdx = startIdx + l[startIdx:].index(")")
             subStr = l[startIdx:stopIdx]
-            print(f"{startIdx} to {stopIdx} checking substr", subStr)
+            # print(f"{startIdx} to {stopIdx} checking substr", subStr)
             if re.match("^[0-9]{1,3},[0-9]{1,3}$",subStr):
-                print("match", subStr)
+                # print("match", subStr)
                 nums = subStr.split(",")
                 total += int(nums[0]) * int(nums[1])
             
     print(total)
 
+# yeah this doesn't work lol something is wrong. almost certainly do and dont calculations
 def part2(lines):
     total = 0
-    for l in lines:
-        l = l.replace("don't()", DONT).replace("do()", DO)
+    l = "".join(lines)
+    l = l.replace("don't()", DONT).replace("do()", DO)
 
-        potentials = find_idx(l, "mul(")
+    potentials = find_idx(l, "mul(")
 
-        for p in potentials:
-            startIdx = p + 4 # because mul( is 4 long
-            if ")" not in l[startIdx:]:
-                break
-            stopIdx = startIdx + l[startIdx:].index(")")
-            subStr = l[startIdx:stopIdx]
-            print(f"{startIdx} to {stopIdx} checking substr", subStr)
-            if re.match("^[0-9]{1,3},[0-9]{1,3}$",subStr):
-                nums = subStr.split(",")
-                # extra if statement here
-                if should_count(l, startIdx):
-                    total += int(nums[0]) * int(nums[1])
+    for p in potentials:
+        startIdx = p + 4 # because mul( is 4 long
+        if ")" not in l[startIdx:]:
+            break
+        stopIdx = startIdx + l[startIdx:].index(")")
+        subStr = l[startIdx:stopIdx]
+        if re.match("^[0-9]{1,3},[0-9]{1,3}$",subStr):
+            nums = subStr.split(",")
+            # extra if statement here
+            if should_count(l, startIdx):
+                # print(f"Counting {nums} because enabled")
+                total += int(nums[0]) * int(nums[1])
             
     print(total)
     pass
 
 def main():
     lines = read_file("input.txt")
-    # part1(lines)
+    part1(lines)
     part2(lines)
 
 if __name__ == "__main__":
